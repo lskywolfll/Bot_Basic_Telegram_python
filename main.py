@@ -4,15 +4,23 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
+from gtts import gTTS
 
 
-updater = Updater("your token telegram bot",
-                  use_context=True)
+def create_voice_recorded(txt: str, lang: str, command: str):
+    recorded = gTTS(text=txt, lang=lang, slow=False)
+    recorded.save(f"{command}.mp3")
+
+
+updater = Updater(
+    "your token ", use_context=True)
 
 
 def start(update: Update, context: CallbackContext):
-    text = "Hola! bienvenido/a al bot de bei luo"
-    update.message.reply_text(text)
+    text = "Hola bienvenido o bienvenida al bot de bei luo"
+    command = "start"
+    create_voice_recorded(text, "es", command)
+    update.message.reply_voice(open(f"{command}.mp3", "rb"))
 
 
 def help(update: Update, context: CallbackContext):
@@ -24,7 +32,7 @@ def help(update: Update, context: CallbackContext):
 
 
 def gmail_url(update: Update, context: CallbackContext):
-    update.message.reply_text("jiaox1577@gmail.com")
+    update.message.reply_text("prueba@gmail.com")
 
 
 def youtube_url(update: Update, context: CallbackContext):
