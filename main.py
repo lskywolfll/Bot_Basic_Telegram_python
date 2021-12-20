@@ -5,15 +5,32 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from gtts import gTTS
+import json
+import requests
+import random
+
+
+updater = Updater(
+    "your token ", use_context=True)
+
+
+def get_proverb():
+    response = requests.get("http://localhost:3000/proverb")
+    proverbs = json.loads(response.content)
+    return random.choice(proverbs)
+
+
+def proverb_aleatory(update: Update, context: CallbackContext):
+    command = "proverb_aleatory"
+    proverb = get_proverb()
+    text = f"{proverb['content']} escrito por {proverb['author']}"
+    create_voice_recorded(text, "es", command)
+    update.message.reply_voice(open(f"{command}.mp3", "rb"))
 
 
 def create_voice_recorded(txt: str, lang: str, command: str):
     recorded = gTTS(text=txt, lang=lang, slow=False)
     recorded.save(f"{command}.mp3")
-
-
-updater = Updater(
-    "your token ", use_context=True)
 
 
 def start(update: Update, context: CallbackContext):
@@ -64,6 +81,9 @@ updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
+updater.dispatcher.add_handler(CommandHandler(
+    'proverb_aleatory', proverb_aleatory))
+
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
 updater.dispatcher.add_handler(MessageHandler(
     # Filters out unknown commands
