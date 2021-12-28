@@ -8,11 +8,17 @@ from gtts import gTTS
 import json
 import requests
 import random
+from proverb.proverb import get_proverb as get_scraping_proverb
 
 
 updater = Updater(
-    "your token ", use_context=True)
+    "your token telegram", use_context=True)
 
+def scraping_proverb_aleatory(update: Update, context: CallbackContext):
+    command = "proverb_scraping_aleatory"
+    proverb = get_scraping_proverb()
+    create_voice_recorded(proverb, "es", command)
+    update.message.reply_voice(open(f"{command}.mp3", "rb"))
 
 def get_proverb():
     response = requests.get("http://localhost:3000/proverb")
@@ -29,7 +35,7 @@ def proverb_aleatory(update: Update, context: CallbackContext):
 
 
 def create_voice_recorded(txt: str, lang: str, command: str):
-    recorded = gTTS(text=txt, lang=lang, slow=False)
+    recorded = gTTS(text=txt, lang=lang, slow=True, tld='es')
     recorded.save(f"{command}.mp3")
 
 
@@ -45,7 +51,8 @@ def help(update: Update, context: CallbackContext):
     /youtube - To get the youtube URL
     /linkedin - To get the LinkedIn profile URL
     /gmail - To get gmail URL
-    /geeks - To get the GeeksforGeeks URL""")
+    /geeks - To get the GeeksforGeeks URL
+    /proverb - to get aleatory proverb scraping""")
 
 
 def gmail_url(update: Update, context: CallbackContext):
@@ -81,6 +88,7 @@ updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
+updater.dispatcher.add_handler(CommandHandler('proverb', scraping_proverb_aleatory))
 updater.dispatcher.add_handler(CommandHandler(
     'proverb_aleatory', proverb_aleatory))
 
